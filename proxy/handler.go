@@ -66,12 +66,12 @@ func (s *handler) handler(srv interface{}, serverStream grpc.ServerStream) error
 	}
 	fullMethodName := lowLevelServerStream.Method()
 	clientCtx, clientCancel := context.WithCancel(serverStream.Context())
-	backendConn, err := s.director(serverStream.Context(), fullMethodName)
+	backendConn, newMethodName, err := s.director(serverStream.Context(), fullMethodName)
 	if err != nil {
 		return err
 	}
 	// TODO(mwitkow): Add a `forwarded` header to metadata, https://en.wikipedia.org/wiki/X-Forwarded-For.
-	clientStream, err := grpc.NewClientStream(clientCtx, clientStreamDescForProxying, backendConn, fullMethodName)
+	clientStream, err := grpc.NewClientStream(clientCtx, clientStreamDescForProxying, backendConn, newMethodName)
 	if err != nil {
 		return err
 	}
